@@ -6,6 +6,16 @@
 
 ---
 ## 1. Project Structure
+cryptography-network-security-exam/
+│
+├── README.md                  # Project overview and execution instructions
+├── risk_assessment.md         # Risk assessment matrix and recommendations
+├── filter_tests.md            # Firewall configuration and traffic test logs
+├── crypto_toolkit.py          # Python security script for encryption & hashing
+├── sample_student_records.csv # Sample unencrypted data (Non-sensitive)
+├── report.tex                 # Technical report source code (LaTeX)
+└── report.pdf                 # Compiled LaTeX report
+
 > **Note:** The key file (`secret.key`) is generated and stored in the parent directory (`../secret.key`) to keep sensitive keys out of public version control.
 
 ---
