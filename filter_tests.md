@@ -11,6 +11,12 @@
 ---
 
 ## Firewall Rules Applied
+```bash
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p tcp -s 10.0.20.0/24 --dport 22 -j DROP
+iptables -A INPUT -p tcp -s 10.0.10.0/24 --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j DROP
+```
 ## Test Execution and Results
 **Test 1: Permitted Connection (Staff Network -> SSH)**
 Source IP: 10.0.10.15 (Staff Workstation)
@@ -30,8 +36,3 @@ Command Executed:
 nc -zv -w 3 192.168.1.100 22
 Expected Outcome: Connection times out or is blocked.
 Actual Result: nc: connect to 192.168.1.100 port 22 (tcp) timed out
-```bash
-iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
-iptables -A INPUT -p tcp -s 10.0.20.0/24 --dport 22 -j DROP
-iptables -A INPUT -p tcp -s 10.0.10.0/24 --dport 22 -j ACCEPT
-iptables -A INPUT -p tcp --dport 22 -j DROP
