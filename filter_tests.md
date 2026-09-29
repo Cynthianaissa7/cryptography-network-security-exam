@@ -18,7 +18,7 @@ iptables -A INPUT -p tcp -s 10.0.10.0/24 --dport 22 -j ACCEPT
 iptables -A INPUT -p tcp --dport 22 -j DROP
 ```
 ## Test Execution and Results
--**Test 1: Permitted Connection (Staff Network -> SSH)**
+**Test 1: Permitted Connection (Staff Network -> SSH)**
 
 - Source IP: 10.0.10.15 (Staff Workstation)
 
@@ -34,7 +34,6 @@ nc -zv -w 3 192.168.1.100 22
 - Source IP: 10.0.20.45 (Guest Workstation)
 
 - Command Executed:
-
 nc -zv -w 3 192.168.1.100 22
 
 - Expected Outcome: Connection times out or is refused.
