@@ -1,0 +1,102 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+    basicstyle=\ttfamily\footnotesize,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    keepspaces=true
+}
+
+\title{\textbf{Cryptography and Network Security Technical Report}\\ \large Integrated Situation Assessment}
+\author{Registration Number: 4202670014}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Risk Assessment}
+A security review of the polytechnic institute identified critical vulnerabilities across core assets. Table \ref{tab:risks} summarizes these assets, vulnerabilities, consequences, risk rankings, and recommended controls.
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+\textbf{Asset} & \textbf{Vulnerability} & \textbf{Consequence} & \textbf{Rank} & \textbf{Control} \\ \midrule
+Records Server & Guest access allowed & Data breach / leak & Critical & Firewall / ACL Segmentation \\
+Data in Transit & Unencrypted transfers & Eavesdropping / MitM & High & AES Encryption / SFTP \\
+Staff Accounts & Weak passwords / OS & System compromise & Medium & Password Policy \& Patching \\ \bottomrule
+\end{tabular}
+\caption{Risk Assessment Matrix}
+\label{tab:risks}
+\end{table}
+
+\section{Encryption and Integrity Application}
+To secure sensitive student records, a Python security toolkit (\texttt{crypto\_toolkit.py}) was developed using the \texttt{cryptography} library.
+
+\subsection{Implementation Details}
+\begin{itemize}
+    \item \textbf{Encryption \& Decryption:} Implemented via symmetric encryption using Fernet (AES-128 in CBC mode with HMAC authentication). The key is generated and stored outside the repository directory (\texttt{../secret.key}).
+    \item \textbf{Integrity Checking:} Calculates and verifies SHA-256 hashes before encryption and after decryption to confirm the restored file is identical to the original.
+    \item \textbf{Error Handling:} Uses standard Python \texttt{try-except} blocks to catch \texttt{FileNotFoundError} and \texttt{InvalidToken} exceptions gracefully without terminating execution.
+\end{itemize}
+
+\subsection{Execution and Test Evidence}
+Below is the terminal output from running \texttt{crypto\_toolkit.py}. Note that the output lines starting with \texttt{[-] Error:...} under Section 4 are **expected test outputs** demonstrating that the error-handling functions successfully capture missing file errors and corrupted decryption attempts without crashing the program:
+
+\begin{lstlisting}[caption={Python Security Toolkit Execution Output}]
+[+] New key generated and saved to '../secret.key'.
+
+--- 1. ENCRYPTION ---
+[+] File successfully encrypted and saved to 'sample_student_records.csv.enc'.
+
+--- 2. DECRYPTION ---
+[+] File successfully decrypted and saved to 'sample_student_records_decrypted.csv'.
+
+--- 3. INTEGRITY CHECK (SHA-256) ---
+Original File Hash: 323a1d7573ffa2eb128eb3196b892cfde06aa4c7fe52566a9ca6ce3f23c8c122
+Expected Hash: 323a1d7573ffa2eb128eb3196b892cfde06aa4c7fe52566a9ca6ce3f23c8c122
+Current Hash:  323a1d7573ffa2eb128eb3196b892cfde06aa4c7fe52566a9ca6ce3f23c8c122
+[+] Integrity Verification Passed: File is untouched.
+
+--- 4. ERROR HANDLING TESTS ---
+Testing missing file:
+[-] Error: [Errno 2] No such file or directory: 'non_existent_file.enc'
+
+Testing corrupted file decryption:
+[-] Error: Decryption failed. Invalid key or corrupted file.
+\end{lstlisting}
+
+\section{Network Traffic Filtering}
+Traffic filtering rules were applied on the host environment using \texttt{iptables} to isolate guest networks and protect the server.
+
+\subsection{Firewall Rules}
+\begin{lstlisting}
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -p tcp -s 10.0.20.0/24 --dport 22 -j DROP
+iptables -A INPUT -p tcp -s 10.0.10.0/24 --dport 22 -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -j DROP
+\end{lstlisting}
+
+\subsection{Test Results}
+\begin{itemize}
+    \item \textbf{Staff Connection (10.0.10.15):} Permitted (\texttt{Connection Succeeded}).
+    \item \textbf{Guest Connection (10.0.20.45):} Blocked (\texttt{Connection Timed Out}).
+    \item \textbf{External Connection (172.16.0.88):} Blocked (\texttt{Connection Timed Out}).
+\end{itemize}
+
+\section{Conclusion and Submission}
+The implementation secures student data both at rest (via AES encryption) and in transit (via SHA-256 hashing and host traffic filtering). Network rules effectively isolate unauthorized subnets from sensitive services.
+
+\textbf{GitHub Repository URL:} \url{https://github.com/cynthianaissa7/cryptography-network-security-exam}
+
+\end{document}
